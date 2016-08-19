@@ -8,6 +8,7 @@
 		.tile {height:17px;width:17px;border:solid #ccc 1px;float:left;}
 		.row {clear:left;}
 		body {text-align:center;margin:auto;}
+		canvas {margin-left:auto;margin-right:auto;}
 	</style>
   </head>
   <body>
@@ -21,7 +22,7 @@
 		<label for="player2">Player 2 URI:</label><input id="player2" />
 		<input type="button" value="Play" id="playButton" />
 	</div>
-	<div id="gameboard"></div>
+	<canvas id="gamecanvas" width="340" height="340"></canvas>
 	<script>
 	var dom = document;
 	require('./gameboard.js');
