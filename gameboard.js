@@ -75,33 +75,41 @@ gameengine.prototype.defineBoard = function(sq){
 	}
 
 	//(n-1 * n)*2
+	var hy=size+2;
+	var vy=1;
 	for(var rn=0;rn<sq;rn++){
 		this.board.vwalls.push({rowid:rn,walls:[]});
 		if(rn < sq-1) {
 			this.board.hwalls.push({rowid:rn,walls:[]});
 		}
+		var hx=1;
+		var vx=size+2;
 		for(var cn=0;cn<sq;cn++) {
 			if(rn < sq-1) {
 				this.board.hwalls[rn].walls.push({
 					walid:cn,
 					blocked:false,
-					x1:size*cn,
-					x2:size*(cn+1),
-					y1:(rn+1)*size,
-					y2:(rn+1)*size
+					x1:hx,
+					x2:hx+size,
+					y1:hy,
+					y2:hy
 				});
 			}
 			if(cn < sq-1) {
 				this.board.vwalls[rn].walls.push({
 					walid:cn,
 					blocked:false,
-					x1:size*(1+cn),
-					x2:size*(1+cn),
-					y1:rn*size,
-					y2:(rn+1)*size
+					x1:vx,
+					x2:vx,
+					y1:vy,
+					y2:vy+size
 				});
 			}
+			hx+=(size+1);
+			vx+=(size+1);
 		}
+		vy+=(size+1);
+		hy+=(size+1);		
 	}
 
 	this.randomWalls(this.board.hwalls);
