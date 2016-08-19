@@ -85,16 +85,13 @@ function defineBoard(sq){
 	randomWalls(board.vwalls);
 }
 
-var domBoard = dom.getElementById('board');
-var domSquare = dom.getElementById('square');
-
 function clearBoard() {
 	board.tiles = [];
 	board.hwalls = [];
 	board.vwalls = [];
 
-	while(domBoard.firstChild) {
-		domBoard.removeChild(domBoard.firstChild);
+	while(gameboard.firstChild) {
+		gameboard.removeChild(gameboard.firstChild);
 	}
 }
 
@@ -129,7 +126,7 @@ function addWall(wall, row, col, classNm) {
 function drawBoard() {
 	clearBoard();
 
-	var sq = parseInt(domSquare.value);
+	var sq = parseInt(square.value);
 	defineBoard(sq);
 
 	for(var row=0;row<board.tiles.length;row++) {
