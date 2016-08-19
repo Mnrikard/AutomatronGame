@@ -86,7 +86,7 @@ function defineBoard(sq){
 }
 
 var domBoard = dom.getElementById('board');
-var domSquare = dom.getElementById('
+var domSquare = dom.getElementById('square');
 
 function clearBoard() {
 	board.tiles = [];
