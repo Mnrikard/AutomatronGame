@@ -98,7 +98,7 @@ function clearBoard() {
 	}
 }
 
-function addTileRow(row)
+function addTileRow(row){
 	var curRow = dom.createElement("div");
 	curRow.id = "row"+row;
 	curRow.className = "row";
