@@ -23,77 +23,8 @@
 	</div>
 	<div id="gameboard"></div>
 	<script>
-function tile(xx,yy){
-	this.x=0;
-	this.y=0;
-	this.wallTop=false;
-	this.wallLeft=false;
-	this.draw = function() {
-		var el = document.createElement("div");
-		el.className = "tile";
-		el.id="row"+yy+"col"+xx;
-		el.innerHTML="&nbsp;";
-		return el;
-	};
-};
-
-var board = {
-	row:[{tile:0}],
-	draw:function(){
-		var board = document.getElementById('gameboard');
-		while(board.firstChild) {
-			board.removeChild(board.firstChild);
-		}
-		var sq = parseInt(document.getElementById('square').value);
-		for(var y=0;y<sq;y++){
-			var curRow = document.createElement("div");
-			curRow.id = "row"+y;
-			curRow.className = "row";
-			board.appendChild(curRow);
-			for(var x=0;x<sq;x++) {
-				var space = new tile(x,y);
-				curRow.appendChild(space.draw());
-			}
-		}
-	},
-	buildWalls:function(){
-		var sq = parseInt(document.getElementById('square').value);
-		var outsideWalls = sq+sq;
-		var wallSpots = ((sq*sq)*2)-outsideWalls;
-		var walls = wallSpots * 0.2;
-
-		var possibleHwalls = [];
-		var possibleVwalls = [];
-		for(var y=0;y<sq;y++) {
-			for(var x=0;x<sq;x++) {
-				possibleHwalls.append("row"+y+"col"+x);
-				possibleVwalls.append("row"+y+"col"+x);
-			}
-		}
-
-		var upright = true;
-		while(walls > 0){
-			var size = Math.floor(Math.random() * 3);
-			walls -= size;
-			
-			var t;
-			if(upright) {
-				t = Math.floor(Math.random()*possibleVwalls.length);
-			} else {
-				t = Math.floor(Math.random()*possibleHwalls.length);
-			}
-
-
-
-			
-			upright = !upright;
-
-		}
-	}
-};
-
-document.getElementById('playButton').addEventListener("click",board.draw,false);
-board.draw();
+	var dom = document;
+	require("./gameboard.js");
 	</script>
 
   </body>

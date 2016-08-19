@@ -1,27 +1,26 @@
 {
-  "name": "electron-quick-start",
+  "name": "Automatron",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Build your robot, watch it fight.",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron/electron-quick-start.git"
+    "url": "git+https://github.com/Mnrikard/AutomatronGame.git"
   },
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial"
+    "Drone",
+    "Game",
+    "Programming"
   ],
-  "author": "GitHub",
+  "author": "Matthew Rikard",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/electron/electron-quick-start/issues"
+    "url": "https://github.com/Mnrikard/AutomatronGame/issues"
   },
-  "homepage": "https://github.com/electron/electron-quick-start#readme",
+  "homepage": "https://github.com/Mnrikard/AutomatronGame#readme",
   "devDependencies": {
     "electron-prebuilt": "^1.2.0"
   }
