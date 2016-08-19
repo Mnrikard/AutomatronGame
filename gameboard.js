@@ -152,5 +152,4 @@ function drawBoard() {
 };
 }
 var game = new gameengine();
-dom.getElementById('playButton').addEventListener("click",game.drawBoard,false);
-game.drawBoard();
+playButton.addEventListener("click",game.drawBoard,false);
