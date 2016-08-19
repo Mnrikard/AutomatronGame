@@ -1,4 +1,4 @@
-function gameboard() {
+function gameengine() {
 var board = {
 	tiles:[],
 	hwalls:[],
@@ -151,6 +151,6 @@ function drawBoard() {
 
 };
 }
-var game = new gameboard();
+var game = new gameengine();
 dom.getElementById('playButton').addEventListener("click",game.drawBoard(),false);
 game.drawBoard();
