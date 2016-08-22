@@ -1,20 +1,30 @@
 function gameengine() {
 }
+
 gameengine.prototype.board = {
 	tiles:[],
 	hwalls:[],
 	vwalls:[]
 };
 
-gameengine.prototype.findAllVertWallsOfLen = function(wallarray, walLen) {
+gameengine.prototype.findAllWallsOfLen = function(wallarray, walLen) {
 	var output = [];
 	for(var row=0;row<wallarray.length;row++) {
 		for(var col=0;col<wallarray[row].walls.length;col++){
 			var include = true;
-			for(var t=row;t<row+walLen;t++){
-				if(!wallarray[t] || !wallarray[t].walls[col] || wallarray[t].walls[col].blocked) {
-					include = false;
-					break;
+			if(wallarray.type == "vert"){
+				for(var t=row;t<row+walLen;t++){
+					if(!wallarray[t] || !wallarray[t].walls[col] || wallarray[t].walls[col].blocked) {
+						include = false;
+						break;
+					}
+				}
+			} else {
+				for(var t=col;t<col+walLen;t++){
+					if(!wallarray[row] || !wallarray[row].walls[t] || wallarray[row].walls[t].blocked) {
+						include = false;
+						break;
+					}
 				}
 			}
 			if(include) {
@@ -25,10 +35,16 @@ gameengine.prototype.findAllVertWallsOfLen = function(wallarray, walLen) {
 	return output;
 };
 
-gameengine.prototype.createRandomVertWalls = function(wallarray, possibles, wallsToBuild) {
+gameengine.prototype.createRandomWall = function(wallarray, possibles, wallsToBuild) {
 	var winner = possibles[Math.floor(Math.random()*possibles.length)];
-	for(var w=winner.prow;w<winner.prow+wallsToBuild;w++){
-		wallarray[w].walls[winner.pcol].blocked = true;
+	if(wallarray.type == "vert") {
+		for(var w=winner.prow;w<winner.prow+wallsToBuild;w++){
+			wallarray[w].walls[winner.pcol].blocked = true;
+		}
+	} else {
+		for(var w=winner.pcol;w<winner.pcol+wallsToBuild;w++){
+			wallarray[winner.prow].walls[w].blocked = true;
+		}
 	}
 };
 
@@ -38,8 +54,8 @@ gameengine.prototype.randomWalls = function(wallarray) {
 	var walLen = 1;
 	var walsBuilt = 0;
 	while(walsBuilt < wallPercent) {
-		var possibles = this.findAllVertWallsOfLen(wallarray, walLen);
-		this.createRandomVertWalls(wallarray, possibles, walLen)
+		var possibles = this.findAllWallsOfLen(wallarray, walLen);
+		this.createRandomWall(wallarray, possibles, walLen)
 
 		walsBuilt += walLen;
 		walLen+=1;
@@ -50,9 +66,11 @@ gameengine.prototype.randomWalls = function(wallarray) {
 };
 
 gameengine.prototype.defineBoard = function(sq){
-	this.board.tiles = [];
-	this.board.hwalls = [];
-	this.board.vwalls = [];
+	this.board = {
+		tiles:[],
+		hwalls:[],
+		vwalls:[]
+	};
 
 	var size = 16;
 	this.board.tileSize = size;
@@ -78,9 +96,9 @@ gameengine.prototype.defineBoard = function(sq){
 	var hy=size+2;
 	var vy=1;
 	for(var rn=0;rn<sq;rn++){
-		this.board.vwalls.push({rowid:rn,walls:[]});
+		this.board.vwalls.push({type:"vert",rowid:rn,walls:[]});
 		if(rn < sq-1) {
-			this.board.hwalls.push({rowid:rn,walls:[]});
+			this.board.hwalls.push({type:"horiz",rowid:rn,walls:[]});
 		}
 		var hx=1;
 		var vx=size+2;
@@ -120,6 +138,10 @@ gameengine.prototype.clearBoard = function() {
 	this.board.tiles = [];
 	this.board.hwalls = [];
 	this.board.vwalls = [];
+	if(this.board.maxSize){
+		var ctx = gamecanvas.getContext("2d");
+		ctx.clearRect(0, 0, this.board.maxSize, this.board.maxSize);
+	}
 };
 
 gameengine.prototype.drawCanvas = function() {
@@ -127,6 +149,8 @@ gameengine.prototype.drawCanvas = function() {
 
 	ctx.fillStyle = "#cccccc";
 	var maxSize = ((this.board.tileSize+1)*(this.board.tiles.length))+1;
+	this.board.maxSize = maxSize;
+	ctx.clearRect(0, 0, maxSize, maxSize);
 	ctx.fillRect(0,0,maxSize,maxSize);
 	
 	ctx.fillStyle = "#ffffff";
@@ -148,6 +172,7 @@ gameengine.prototype.drawWall = function(ctx, wallarray) {
 		for(var wc=0;wc<wallarray[wr].walls.length;wc++) {
 			var wall = wallarray[wr].walls[wc];
 			if(wall.blocked) {
+				ctx.beginPath();
 				ctx.moveTo(wall.x1,wall.y1);
 				ctx.lineTo(wall.x2,wall.y2);
 				ctx.stroke();
@@ -166,5 +191,8 @@ gameengine.prototype.drawBoard = function() {
 };
 
 var game = new gameengine();
-playButton.addEventListener("click",game.drawBoard,false);
+playButton.addEventListener("click",function(){
+	game.clearBoard();
+	game.drawBoard();
+},false);
 game.drawBoard();
