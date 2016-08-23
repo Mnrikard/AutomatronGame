@@ -3,8 +3,36 @@ function gameengine() {
 
 gameengine.prototype.board = {
 	tiles:[],
-	hwalls:[],
-	vwalls:[]
+	walls:{
+		horiz:[],
+		vert:[]
+	}
+};
+
+gameengine.prototype.tiebreaker(player1,player2){
+	if(player1.action == "move"){
+		switch(player2.action){
+			case "move":
+				if(player1.x==player1.x && player2.y==player1.y) {
+					player2.action = "cancel";
+					player1.action = "cancel";
+				}
+				break;
+			case "shoot":
+				if(
+		}
+
+	}
+}
+
+gameengine.prototype.turn(player1,player2) {
+	// make the move then check the tiebreaker
+	// undo the move if need be
+	this.prepMove(player1);
+	this.prepMove(player2);
+	if(player1.x==player2.x && player1.y==player2.y){
+
+	}
 };
 
 gameengine.prototype.findAllWallsOfLen = function(wallarray, walLen) {
@@ -65,11 +93,15 @@ gameengine.prototype.randomWalls = function(wallarray) {
 	}
 };
 
+
+
 gameengine.prototype.defineBoard = function(sq){
 	this.board = {
 		tiles:[],
-		hwalls:[],
-		vwalls:[]
+		walls:{
+			horiz:[],
+			vert:[]
+		}
 	};
 
 	var size = 16;
@@ -96,15 +128,15 @@ gameengine.prototype.defineBoard = function(sq){
 	var hy=size+2;
 	var vy=1;
 	for(var rn=0;rn<sq;rn++){
-		this.board.vwalls.push({type:"vert",rowid:rn,walls:[]});
+		this.board.walls.vert.push({type:"vert",rowid:rn,walls:[]});
 		if(rn < sq-1) {
-			this.board.hwalls.push({type:"horiz",rowid:rn,walls:[]});
+			this.board.walls.horiz.push({type:"horiz",rowid:rn,walls:[]});
 		}
 		var hx=1;
 		var vx=size+2;
 		for(var cn=0;cn<sq;cn++) {
 			if(rn < sq-1) {
-				this.board.hwalls[rn].walls.push({
+				this.board.walls.horiz[rn].walls.push({
 					walid:cn,
 					blocked:false,
 					x1:hx,
@@ -114,7 +146,7 @@ gameengine.prototype.defineBoard = function(sq){
 				});
 			}
 			if(cn < sq-1) {
-				this.board.vwalls[rn].walls.push({
+				this.board.walls.vert[rn].walls.push({
 					walid:cn,
 					blocked:false,
 					x1:vx,
@@ -130,14 +162,13 @@ gameengine.prototype.defineBoard = function(sq){
 		hy+=(size+1);		
 	}
 
-	this.randomWalls(this.board.hwalls);
-	this.randomWalls(this.board.vwalls);
+	this.randomWalls(this.board.walls.horiz);
+	this.randomWalls(this.board.walls.vert);
 };
 
 gameengine.prototype.clearBoard = function() {
 	this.board.tiles = [];
-	this.board.hwalls = [];
-	this.board.vwalls = [];
+	this.board.walls = {horiz:[],vert:[]};
 	if(this.board.maxSize){
 		var ctx = gamecanvas.getContext("2d");
 		ctx.clearRect(0, 0, this.board.maxSize, this.board.maxSize);
@@ -163,8 +194,8 @@ gameengine.prototype.drawCanvas = function() {
 
 	ctx.fillStyle = "#000000";
 
-	this.drawWall(ctx, this.board.hwalls);
-	this.drawWall(ctx, this.board.vwalls);
+	this.drawWall(ctx, this.board.walls.horiz);
+	this.drawWall(ctx, this.board.walls.vert);
 };
 
 gameengine.prototype.drawWall = function(ctx, wallarray) {
