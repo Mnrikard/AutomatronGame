@@ -9,31 +9,6 @@ gameengine.prototype.board = {
 	}
 };
 
-gameengine.prototype.tiebreaker(player1,player2){
-	if(player1.action == "move"){
-		switch(player2.action){
-			case "move":
-				if(player1.x==player1.x && player2.y==player1.y) {
-					player2.action = "cancel";
-					player1.action = "cancel";
-				}
-				break;
-			case "shoot":
-				if(
-		}
-
-	}
-}
-
-gameengine.prototype.turn(player1,player2) {
-	// make the move then check the tiebreaker
-	// undo the move if need be
-	this.prepMove(player1);
-	this.prepMove(player2);
-	if(player1.x==player2.x && player1.y==player2.y){
-
-	}
-};
 
 gameengine.prototype.findAllWallsOfLen = function(wallarray, walLen) {
 	var output = [];
