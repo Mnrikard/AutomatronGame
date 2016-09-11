@@ -126,12 +126,12 @@ gameengine.prototype.play = function() {
 
 	this.drawBot = function(player) {
 		this.randomPlacement(player);
-		var img = document.createElement("img");
-		img.src = player.image;
+		var avatar = new Image();
+		avatar.src = player.image;
 		var ctx = gamecanvas.getContext("2d");
 		var px = (gamesettings.tileSize+1) * player.col;
 		var py = (gamesettings.tileSize+1) * player.row;
-		ctx.drawImage(img,px,py,gamesettings.tileSize,gamesettings.tileSize);
+		ctx.drawImage(avatar,px,py,gamesettings.tileSize,gamesettings.tileSize);
 	};
 
 	this.startGame = function() {
