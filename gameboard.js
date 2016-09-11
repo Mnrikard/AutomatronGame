@@ -9,6 +9,22 @@ gameengine.prototype.board = {
 	}
 };
 
+function defaultGameSettings(){
+	return {
+		"square":20,
+		"maxMoves":-1,
+		"tileSize":26,
+		"players":[
+			{
+				"image":"./images/tank.png",
+				"executable":"echo \"move n\""
+			}	
+		],
+		"frameRate":500
+	}
+};
+
+var gamesettings = defaultGameSettings();
 
 gameengine.prototype.findAllWallsOfLen = function(wallarray, walLen) {
 	var output = [];
@@ -69,6 +85,54 @@ gameengine.prototype.randomWalls = function(wallarray) {
 };
 
 
+gameengine.prototype.play = function() {
+	this.getRandomPlacement = function() {
+		var rx = Math.floor(Math.random()*this.board.tiles.length);
+		var ry = Math.floor(Math.random()*this.board.tiles.length);
+		return {"row":ry,"col":rx};
+	};
+
+	this.randomPlacement = function(player){
+		while(true){
+			var pos = this.getRandomPlacement();
+			for(var p=0;p<gamesettings.players.length;p++) {
+				if(gamesettings.players[p].row == pos.row && gamesettings.players[p].col == pos.col) {
+					continue;
+				}
+			}
+			player.row = pos.row;
+			player.col = pos.col;
+			break;
+		}
+	};
+
+	this.gameTimer = null;
+
+
+	this.drawBot = function(player) {
+		this.randomPlacement(player);
+		var img = document.createElement("img");
+		img.src = player.image;
+		var ctx = gamecanvas.getContext("2d");
+		var px = (gamesettings.tileSize+1) * player.col;
+		var py = (gamesettings.tileSize+1) * player.row;
+		ctx.drawImage(img,px,py,gamesettings.tileSize,gamesettings.tileSize);
+	};
+
+	this.startGame = function() {
+		for(var p=0;p<gamesettings.players.length;p++){
+			this.drawBot(gamesettings.players[p]);
+		}
+		this.gameTimer = setInterval(this.makeMoves, gamesettings.frameRate);
+	};
+
+	this.makeMoves = function() {
+
+	}
+
+	this.startGame();
+};
+
 
 gameengine.prototype.defineBoard = function(sq){
 	this.board = {
@@ -78,9 +142,6 @@ gameengine.prototype.defineBoard = function(sq){
 			vert:[]
 		}
 	};
-
-	var size = 16;
-	this.board.tileSize = size;
 
 	if(sq < 1){
 		alert("why you no define larger board?");
@@ -93,14 +154,14 @@ gameengine.prototype.defineBoard = function(sq){
 			this.board.tiles[r].columns.push({
 				colid:c,
 				contents:null,
-				x:(size*c)+c+1,
-				y:(size*r)+r+1
+				x:(gamesettings.tileSize*c)+c+1,
+				y:(gamesettings.tileSize*r)+r+1
 			});
 		}
 	}
 
 	//(n-1 * n)*2
-	var hy=size+2;
+	var hy=gamesettings.tileSize+2;
 	var vy=1;
 	for(var rn=0;rn<sq;rn++){
 		this.board.walls.vert.push({type:"vert",rowid:rn,walls:[]});
@@ -108,14 +169,14 @@ gameengine.prototype.defineBoard = function(sq){
 			this.board.walls.horiz.push({type:"horiz",rowid:rn,walls:[]});
 		}
 		var hx=1;
-		var vx=size+2;
+		var vx=gamesettings.tileSize+2;
 		for(var cn=0;cn<sq;cn++) {
 			if(rn < sq-1) {
 				this.board.walls.horiz[rn].walls.push({
 					walid:cn,
 					blocked:false,
 					x1:hx,
-					x2:hx+size,
+					x2:hx+gamesettings.tileSize,
 					y1:hy,
 					y2:hy
 				});
@@ -127,14 +188,14 @@ gameengine.prototype.defineBoard = function(sq){
 					x1:vx,
 					x2:vx,
 					y1:vy,
-					y2:vy+size
+					y2:vy+gamesettings.tileSize
 				});
 			}
-			hx+=(size+1);
-			vx+=(size+1);
+			hx+=(gamesettings.tileSize+1);
+			vx+=(gamesettings.tileSize+1);
 		}
-		vy+=(size+1);
-		hy+=(size+1);		
+		vy+=(gamesettings.tileSize+1);
+		hy+=(gamesettings.tileSize+1);		
 	}
 
 	this.randomWalls(this.board.walls.horiz);
@@ -154,7 +215,9 @@ gameengine.prototype.drawCanvas = function() {
 	var ctx = gamecanvas.getContext("2d");
 
 	ctx.fillStyle = "#cccccc";
-	var maxSize = ((this.board.tileSize+1)*(this.board.tiles.length))+1;
+	var maxSize = ((gamesettings.tileSize+1)*(this.board.tiles.length))+1;
+	gamecanvas.width = maxSize;
+	gamecanvas.height = maxSize;
 	this.board.maxSize = maxSize;
 	ctx.clearRect(0, 0, maxSize, maxSize);
 	ctx.fillRect(0,0,maxSize,maxSize);
@@ -163,7 +226,7 @@ gameengine.prototype.drawCanvas = function() {
 	for(var r=0; r<this.board.tiles.length; r++) {
 		for(var c=0;c<this.board.tiles[r].columns.length;c++){
 			var cell = this.board.tiles[r].columns[c];
-			ctx.fillRect(cell.x,cell.y,this.board.tileSize,this.board.tileSize);
+			ctx.fillRect(cell.x,cell.y,gamesettings.tileSize,gamesettings.tileSize);
 		}
 	}
 
@@ -179,6 +242,7 @@ gameengine.prototype.drawWall = function(ctx, wallarray) {
 			var wall = wallarray[wr].walls[wc];
 			if(wall.blocked) {
 				ctx.beginPath();
+				ctx.lineWidth = 3;
 				ctx.moveTo(wall.x1,wall.y1);
 				ctx.lineTo(wall.x2,wall.y2);
 				ctx.stroke();
@@ -190,7 +254,7 @@ gameengine.prototype.drawWall = function(ctx, wallarray) {
 gameengine.prototype.drawBoard = function() {
 	this.clearBoard();
 
-	var sq = parseInt(square.value);
+	var sq = gamesettings.square;
 	this.defineBoard(sq);
 
 	this.drawCanvas();
@@ -200,5 +264,6 @@ var game = new gameengine();
 playButton.addEventListener("click",function(){
 	game.clearBoard();
 	game.drawBoard();
+	game.play();
 },false);
 game.drawBoard();

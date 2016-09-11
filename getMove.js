@@ -1,5 +1,5 @@
 function callPlayer(info, player) {
-	var exec= require('child_process').exec;
+	var exec = require('child_process').exec;
 	
 	var result = '';
 
