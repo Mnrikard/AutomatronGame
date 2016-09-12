@@ -132,7 +132,7 @@ gameengine.prototype.drawCanvas = function() {
 	var ctx = gamecanvas.getContext("2d");
 
 	ctx.fillStyle = "#cccccc";
-	var maxSize = ((gamesettings.tileSize+1)*(this.board.tiles.length))+1;
+	var maxSize = ((gamesettings.tileSize+1)*(this.board.tiles.length+1))+1;
 	gamecanvas.width = maxSize;
 	gamecanvas.height = maxSize;
 	this.board.maxSize = maxSize;
@@ -146,6 +146,16 @@ gameengine.prototype.drawCanvas = function() {
 			ctx.fillRect(cell.x,cell.y,gamesettings.tileSize,gamesettings.tileSize);
 		}
 	}
+
+	for(r=0;r<this.board.tiles.length;r++){
+		var yp = ((gamesettings.tileSize+1)*r)+(gamesettings.tileSize/2);
+		var xp = maxSize-gamesettings.tileSize;
+		ctx.fillStyle = "#ffff00";
+		ctx.fillText(r,xp,yp);
+
+		ctx.fillText(r,yp,xp+(gamesettings.tileSize/2));
+	}
+
 
 	ctx.fillStyle = "#000000";
 

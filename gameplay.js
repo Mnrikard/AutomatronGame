@@ -23,21 +23,50 @@ exports.randomPlacement = function(player){
 
 exports.gameTimer = null;
 
-exports.drawBot = function(player) {
+function getRotateOffsetX(dir){
+	if(dir.match(/[sw]/i)){
+		return -gamesettings.tileSize;
+	}
+	return 0;
+};
+
+function getRotateOffsetY(dir){
+	if(dir.match(/[es]/i)){
+		return -gamesettings.tileSize;
+	}
+	return 0;
+}
+
+function rotateDirection(dir){
+	if(dir.match(/e/i)){
+		return 90;
+	} else if(dir.match(/s/i)){
+		return 180;
+	} else if(dir.match(/w/i)){
+		return 270;
+	}
+	return 0;
+};
+
+exports.drawBot = function(player, direction) {
 	this.randomPlacement(player);
 	var avatar = new Image();
 	avatar.src = player.image;
 	var ctx = gamecanvas.getContext("2d");
+	ctx.save();
 	var px = (gamesettings.tileSize+1) * player.col;
 	var py = (gamesettings.tileSize+1) * player.row;
-	ctx.drawImage(avatar,px,py,gamesettings.tileSize,gamesettings.tileSize);
+	ctx.translate(px,py);
+	ctx.rotate(rotateDirection(direction)*Math.PI/180);
+	ctx.drawImage(avatar,getRotateOffsetX(direction),getRotateOffsetY(direction),gamesettings.tileSize,gamesettings.tileSize);
+	ctx.restore();
 };
 
 exports.startGame = function(boardDef, settings) {
 	this.board = boardDef;
 	gamesettings = settings;
 	for(var p=0;p<gamesettings.players.length;p++){
-		this.drawBot(gamesettings.players[p]);
+		this.drawBot(gamesettings.players[p],"s");
 	}
 	this.gameTimer = setInterval(this.makeMoves, gamesettings.frameRate);
 };
