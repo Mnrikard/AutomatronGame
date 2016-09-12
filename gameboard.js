@@ -14,6 +14,7 @@ Copyright 2016 Matthew Rikard
    limitations under the License.
 */
 function gameengine() {
+	this.play = require('./gameplay');
 }
 
 gameengine.prototype.board = {
@@ -31,6 +32,7 @@ function defaultGameSettings(){
 		"tileSize":26,
 		"players":[
 			{
+
 				"image":"./images/tank.png",
 				"executable":"echo \"move n\""
 			}	
@@ -41,131 +43,11 @@ function defaultGameSettings(){
 
 var gamesettings = defaultGameSettings();
 
-gameengine.prototype.findAllWallsOfLen = function(wallarray, walLen) {
-	var output = [];
-	for(var row=0;row<wallarray.length;row++) {
-		for(var col=0;col<wallarray[row].walls.length;col++){
-			var include = true;
-			if(wallarray.type == "vert"){
-				for(var t=row;t<row+walLen;t++){
-					if(!wallarray[t] || !wallarray[t].walls[col] || wallarray[t].walls[col].blocked) {
-						include = false;
-						break;
-					}
-				}
-			} else {
-				for(var t=col;t<col+walLen;t++){
-					if(!wallarray[row] || !wallarray[row].walls[t] || wallarray[row].walls[t].blocked) {
-						include = false;
-						break;
-					}
-				}
-			}
-			if(include) {
-				output.push({prow:row,pcol:col});
-			}
-		}
-	}
-	return output;
-};
 
-gameengine.prototype.createRandomWall = function(wallarray, possibles, wallsToBuild) {
-	var winner = possibles[Math.floor(Math.random()*possibles.length)];
-	if(wallarray.type == "vert") {
-		for(var w=winner.prow;w<winner.prow+wallsToBuild;w++){
-			wallarray[w].walls[winner.pcol].blocked = true;
-		}
-	} else {
-		for(var w=winner.pcol;w<winner.pcol+wallsToBuild;w++){
-			wallarray[winner.prow].walls[w].blocked = true;
-		}
-	}
-};
-
-gameengine.prototype.randomWalls = function(wallarray) {
-	var wallPercent = 0.2*Math.pow(wallarray.length,2);
-
-	var walLen = 1;
-	var walsBuilt = 0;
-	while(walsBuilt < wallPercent) {
-		var possibles = this.findAllWallsOfLen(wallarray, walLen);
-		this.createRandomWall(wallarray, possibles, walLen)
-
-		walsBuilt += walLen;
-		walLen+=1;
-		if(walLen > 3){
-			walLen=1;
-		}
-	}
-};
-
-
-gameengine.prototype.play = function() {
-	this.getRandomPlacement = function() {
-		var rx = Math.floor(Math.random()*this.board.tiles.length);
-		var ry = Math.floor(Math.random()*this.board.tiles.length);
-		return {"row":ry,"col":rx};
-	};
-
-	this.randomPlacement = function(player){
-		while(true){
-			var pos = this.getRandomPlacement();
-			for(var p=0;p<gamesettings.players.length;p++) {
-				if(gamesettings.players[p].row == pos.row && gamesettings.players[p].col == pos.col) {
-					continue;
-				}
-			}
-			player.row = pos.row;
-			player.col = pos.col;
-			break;
-		}
-	};
-
-	this.gameTimer = null;
-
-
-	this.drawBot = function(player) {
-		this.randomPlacement(player);
-		var avatar = new Image();
-		avatar.src = player.image;
-		var ctx = gamecanvas.getContext("2d");
-		var px = (gamesettings.tileSize+1) * player.col;
-		var py = (gamesettings.tileSize+1) * player.row;
-		ctx.drawImage(avatar,px,py,gamesettings.tileSize,gamesettings.tileSize);
-	};
-
-	this.startGame = function() {
-		for(var p=0;p<gamesettings.players.length;p++){
-			this.drawBot(gamesettings.players[p]);
-		}
-		this.gameTimer = setInterval(this.makeMoves, gamesettings.frameRate);
-	};
-
-	this.makeMoves = function() {
-
-	}
-
-	this.startGame();
-};
-
-
-gameengine.prototype.defineBoard = function(sq){
-	this.board = {
-		tiles:[],
-		walls:{
-			horiz:[],
-			vert:[]
-		}
-	};
-
-	if(sq < 1){
-		alert("why you no define larger board?");
-		return;
-	}
-
-	for(var r=0;r<sq;r++) {
+gameengine.prototype.addTiles = function(){
+	for(var r=0;r<gamesettings.square;r++) {
 		this.board.tiles.push({rowid:r,columns:[]});
-		for(var c=0;c<sq;c++){
+		for(var c=0;c<gamesettings.square;c++){
 			this.board.tiles[r].columns.push({
 				colid:c,
 				contents:null,
@@ -174,19 +56,20 @@ gameengine.prototype.defineBoard = function(sq){
 			});
 		}
 	}
+};
 
-	//(n-1 * n)*2
+gameengine.prototype.addWallSpaces = function() {
 	var hy=gamesettings.tileSize+2;
 	var vy=1;
-	for(var rn=0;rn<sq;rn++){
+	for(var rn=0;rn<gamesettings.square;rn++){
 		this.board.walls.vert.push({type:"vert",rowid:rn,walls:[]});
-		if(rn < sq-1) {
+		if(rn < gamesettings.square-1) {
 			this.board.walls.horiz.push({type:"horiz",rowid:rn,walls:[]});
 		}
 		var hx=1;
 		var vx=gamesettings.tileSize+2;
-		for(var cn=0;cn<sq;cn++) {
-			if(rn < sq-1) {
+		for(var cn=0;cn<gamesettings.square;cn++) {
+			if(rn < gamesettings.square-1) {
 				this.board.walls.horiz[rn].walls.push({
 					walid:cn,
 					blocked:false,
@@ -196,7 +79,7 @@ gameengine.prototype.defineBoard = function(sq){
 					y2:hy
 				});
 			}
-			if(cn < sq-1) {
+			if(cn < gamesettings.square-1) {
 				this.board.walls.vert[rn].walls.push({
 					walid:cn,
 					blocked:false,
@@ -212,9 +95,28 @@ gameengine.prototype.defineBoard = function(sq){
 		vy+=(gamesettings.tileSize+1);
 		hy+=(gamesettings.tileSize+1);		
 	}
+};
 
-	this.randomWalls(this.board.walls.horiz);
-	this.randomWalls(this.board.walls.vert);
+gameengine.prototype.defineBoard = function(){
+	this.board = {
+		tiles:[],
+		walls:{
+			horiz:[],
+			vert:[]
+		}
+	};
+
+	if(gamesettings.square < 1){
+		alert("why you no define larger board?");
+		return;
+	}
+
+	this.addTiles();
+	this.addWallSpaces();
+
+	var rando = require("./randomizer");
+	rando.randomWalls(this.board.walls.horiz);
+	rando.randomWalls(this.board.walls.vert);
 };
 
 gameengine.prototype.clearBoard = function() {
@@ -269,8 +171,7 @@ gameengine.prototype.drawWall = function(ctx, wallarray) {
 gameengine.prototype.drawBoard = function() {
 	this.clearBoard();
 
-	var sq = gamesettings.square;
-	this.defineBoard(sq);
+	this.defineBoard();
 
 	this.drawCanvas();
 };
@@ -279,6 +180,6 @@ var game = new gameengine();
 playButton.addEventListener("click",function(){
 	game.clearBoard();
 	game.drawBoard();
-	game.play();
+	game.play.startGame(game.board, gamesettings);
 },false);
 game.drawBoard();
