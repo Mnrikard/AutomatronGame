@@ -72,6 +72,16 @@ exports.startGame = function(boardDef, settings) {
 };
 
 exports.makeMoves = function() {
-
+/*
+ * request move
+ * stage move
+ * throw away clashes
+ * animate orient pieces
+ * animate move
+ *
+ * */
+	for(var p=0; p<gamesettings.players.length;p++) {
+		
+	}
 };
 
