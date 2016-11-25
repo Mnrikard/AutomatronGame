@@ -150,5 +150,6 @@ exports.drawBoard = function() {
 	this.defineBoard();
 
 	this.drawCanvas();
+	return this.board;
 };
 

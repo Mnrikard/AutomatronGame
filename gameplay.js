@@ -1,9 +1,13 @@
-exports.board = null;
 var gamesettings = null;
+var board = null;
+
+exports.refreshBoard = function(){
+	return board;
+}
 
 exports.getRandomPlacement = function() {
-	var rx = Math.floor(Math.random()*this.board.tiles.length);
-	var ry = Math.floor(Math.random()*this.board.tiles.length);
+	var rx = Math.floor(Math.random()*board.tiles.length);
+	var ry = Math.floor(Math.random()*board.tiles.length);
 	return {"row":ry,"col":rx};
 };
 
@@ -63,12 +67,12 @@ exports.drawBot = function(player, direction) {
 };
 
 exports.startGame = function(boardDef, settings) {
-	this.board = boardDef;
+	board = boardDef;
 	gamesettings = settings;
 	for(var p=0;p<gamesettings.players.length;p++){
 		this.drawBot(gamesettings.players[p],"s");
 	}
-	this.gameTimer = setInterval(this.makeMoves, gamesettings.frameRate);
+	this.gameTimer = setTimeout(this.makeMoves, gamesettings.frameRate);
 };
 
 exports.makeMoves = function() {
@@ -80,8 +84,18 @@ exports.makeMoves = function() {
  * animate move
  *
  * */
+	var boardinfo = {"board":board,"items":[]};
 	for(var p=0; p<gamesettings.players.length;p++) {
-		
+		boardinfo.items.push({"item":"player","col":gamesettings.players[p].col,"row":gamesettings.players[p].row});
+	}
+
+	writeFile(gamesettings.fileLocation+"/boardinfo", JSON.stringify(boardinfo));
+
+	for(var p=0; p<gamesettings.players.length;p++) {
+		if(gamesettings.players[p].input === "file"){
+			
+		}
+		exec(
 	}
 };
 

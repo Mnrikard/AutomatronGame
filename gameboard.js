@@ -34,10 +34,11 @@ function defaultGameSettings(){
 		"players":[
 			{
 				"image":"./images/tank.png",
-				"executable":"echo \"move n\""
+				"executable":"echo \"{action:'move',direction='n'}\""
+				"input":"standardinput"//file, http
 			}	
 		],
-		"frameRate":500
+		"frameRate":5000
 	}
 };
 
@@ -50,7 +51,7 @@ game.artist.gamesettings = gamesettings;
 
 playButton.addEventListener("click",function(){
 	game.artist.clearBoard();
-	game.artist.drawBoard();
+	game.board = game.artist.drawBoard();
 	game.play.startGame(game.board, gamesettings);
 },false);
 game.artist.drawBoard();
