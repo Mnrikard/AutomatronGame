@@ -15,7 +15,7 @@ Copyright 2016 Matthew Rikard
 */
 function gameengine() {
 	this.play = require('./gameplay');
-	this.artist = require('./boardBuilder');
+	this.artist = require('./artist');
 }
 
 gameengine.prototype.board = {
@@ -34,11 +34,12 @@ function defaultGameSettings(){
 		"players":[
 			{
 				"image":"./images/tank.png",
-				"executable":"echo \"{action:'move',direction='n'}\""
-				"input":"standardinput"//file, http
+				"executable":"echo \"{action:'move',direction='n'}\"",
+				"input":"standardinput"//file
 			}	
 		],
-		"frameRate":5000
+		"frameRate":5000,
+		"savelocation":"/home/rugg/AutoGameSaves"
 	}
 };
 

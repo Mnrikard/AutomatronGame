@@ -1,9 +1,9 @@
-function callPlayer(info, player) {
+export.callPlayer = function(process) {
 	var exec = require('child_process').exec;
 	
 	var result = '';
 
-	var child = exec(player.executable + ' ' + info);
+	var child = exec(process, function(a,b,c){ });
 
 	child.stdout.on('data', function(data) {
 	    result += data;
