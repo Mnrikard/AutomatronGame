@@ -1,4 +1,4 @@
-function moveAction() {
+exports.moveAction = function() {
 	this.boardState = null;
 	this.playerLocation = {row:-1,col:-1};
 	this.prepareMove = function(direction) {};
@@ -59,6 +59,20 @@ function moveAction() {
 		}
 		return output;
 	}
+
+	this.getMove(movename){
+		switch(movename.toLower()){
+			case "drive":
+				return new drive();
+			case "shoot":
+				return new shoot();
+			case "build":
+				return new build();
+			case "view":
+				return new view();
+		}
+		throw new exception("move not found "+movename);
+	}
 }
 
 function drive() {
@@ -114,21 +128,4 @@ function view() {
 
 	this.moveOrder = 100;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

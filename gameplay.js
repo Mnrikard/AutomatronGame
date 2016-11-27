@@ -144,31 +144,35 @@ function writeFile(name, content){
 }
 
 exports.makeMoves = function() {
-/*
- * request move
- * stage move
- * throw away clashes
- * animate orient pieces
- * animate move
- *
- * */
+	/*
+	* request move
+	* stage move
+	* throw away clashes
+	* animate orient pieces
+	* animate move
+	*
+	* */
 
 	var file = getFileSaveLoc();
 	var stringboard = JSON.stringify(buildBoardInfo());
 	writeFile(file, stringboard);
 
-	var exec = require('child_process').exec;
+	var caller = require('getMove');
 
 	for(var p=0; p<gamesettings.players.length;p++) {
 		var runthis;
 		if(gamesettings.players[p].input === "file"){
-			runthis = exec(gamesettings.players[p].executable+" \""+file+"\"", function(a,b,c){ });
+			runthis = gamesettings.players[p].executable+" \""+file+"\"";
 		}else{
-			runthis = exec(gamesettings.players[p].executable+" "+stringboard, function(a,b,c){ });
+			runthis = gamesettings.players[p].executable+" "+stringboard;
 		}
-		gamesettings.players[p].response = runthis;
+		var exeResponse = JSON.parse(caller.callPlayer(runthis));
+		gamesettings.players[p].response = exeResponse;
+		var mover = require('moveAction').moveAction;
+		gamesettings.players[p].moveAction = mover.getMove(exeResponse.action);
 	}
 
+	
 
 };
 
