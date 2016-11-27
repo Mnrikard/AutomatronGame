@@ -55,11 +55,13 @@ function rotateDirection(dir){
 
 function cleanDirectoryBeforeGame(){
 	fs.readdir(gamesettings.savelocation, (err, files) => {
-		files.forEach(file => {
-			if(file.match(/^board.+json$/i)){
-				fs.unlink(gamesettings.savelocation+"/"+file);
-			}
-		});
+		if(files !== undefined){
+			files.forEach(file => {
+				if(file.match(/^board.+json$/i)){
+					fs.unlink(gamesettings.savelocation+"/"+file);
+				}
+			});
+		}
 	});
 }
 
@@ -157,7 +159,7 @@ exports.makeMoves = function() {
 	var stringboard = JSON.stringify(buildBoardInfo());
 	writeFile(file, stringboard);
 
-	var caller = require('getMove');
+	var caller = require('./playerExec');
 
 	for(var p=0; p<gamesettings.players.length;p++) {
 		var runthis;
@@ -166,13 +168,13 @@ exports.makeMoves = function() {
 		}else{
 			runthis = gamesettings.players[p].executable+" "+stringboard;
 		}
-		var exeResponse = JSON.parse(caller.callPlayer(runthis));
+		var exeResponse = JSON.parse(caller.playerExec(runthis));
+		console.log(exeResponse);
 		gamesettings.players[p].response = exeResponse;
-		var mover = require('moveAction').moveAction;
+		var mover = require('./moveAction');
 		gamesettings.players[p].moveAction = mover.getMove(exeResponse.action);
+		gamesettings.players[p].moveAction("n");
 	}
-
-	
 
 };
 

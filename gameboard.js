@@ -38,8 +38,8 @@ function defaultGameSettings(){
 				"input":"standardinput"//file
 			}	
 		],
-		"frameRate":5000,
-		"savelocation":"/home/rugg/AutoGameSaves"
+		"frameRate":1000,
+		"savelocation":"./AutoGameSaves"
 	}
 };
 

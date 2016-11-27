@@ -1,3 +1,19 @@
+exports.getMove = function(movename){
+	switch(movename.toLowerCase()){
+		case "drive":
+			return new this.drive();
+		case "shoot":
+			return new this.shoot();
+		case "build":
+			return new this.build();
+		case "view":
+			return new this.view();
+		case "timeout":
+			return new this.timeout();
+	}
+	throw "move not found:"+movename;
+}
+
 exports.moveAction = function() {
 	this.boardState = null;
 	this.playerLocation = {row:-1,col:-1};
@@ -12,7 +28,7 @@ exports.moveAction = function() {
 	* view = 100
 	*/
 
-	this.tilesUntilWall(direction){
+	this.tilesUntilWall = function(direction){
 		var tilerow = this.playerLocation.row;
 		var tilecol = this.playerLocation.col;
 		var wallRow = this.playerLocation.row;
@@ -60,23 +76,10 @@ exports.moveAction = function() {
 		return output;
 	}
 
-	this.getMove(movename){
-		switch(movename.toLower()){
-			case "drive":
-				return new drive();
-			case "shoot":
-				return new shoot();
-			case "build":
-				return new build();
-			case "view":
-				return new view();
-		}
-		throw new exception("move not found "+movename);
-	}
 }
 
-function drive() {
-	moveAction.call(this);
+exports.drive = function() {
+	this.moveAction.call(this);
 	this.prepareMove = function(direction){
 		var movespace = this.tilesUntilWall(direction);
 		if(movespace.length > 1) {
@@ -86,10 +89,18 @@ function drive() {
 		}
 	};
 	this.moveOrder = 10;
-}
+};
 
-function shoot() {
-	moveAction.call(this);
+exports.timeout = function() {
+	this.moveAction.call(this);
+	this.prepareMove = function(direction){
+		alert("executable timed out (10 seconds)");
+	};
+	this.moveOrder = 0;
+};
+
+exports.shoot = function() {
+	this.moveAction.call(this);
 	this.prepareMove = function(direction) {
 		var movespace = this.tilesUntilWall(direction);
 		this.tilesAffected = movespace.splice(0,1);
@@ -98,10 +109,10 @@ function shoot() {
 
 	}
 	this.moveOrder = 20;
-}
+};
 
-function build() {
-	moveAction.call(this);
+exports.build = function() {
+	this.moveAction.call(this);
 	this.prepareMove = function(direction) {
 		this.tilesAffected = [];
 		if(direction.match(/^n$/i)) { this.buildWall(this.boardState.walls.horiz, this.playerLocation.row-1, this.playerLocation.col);return;}
@@ -117,15 +128,15 @@ function build() {
 	};
 
 	this.moveOrder = 30;
-}
+};
 
-function view() {
-	moveAction.call(this);
+exports.view = function() {
+	this.moveAction.call(this);
 	this.prepareMove = function(direction) {
 		this.currentView = {};
 	};
 	this.makeMove = function(){};
 
 	this.moveOrder = 100;
-}
+};
 
