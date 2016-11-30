@@ -1,36 +1,54 @@
-exports.moveActions = function(){
-class Animal {
-    name: string;
-    constructor(theName: string) { this.name = theName; }
-    move(distanceInMeters: number = 0) {
-        console.log(`${this.name} moved ${distanceInMeters}m.`);
-    }
-}
-class Snake extends Animal {
-    constructor(name: string) { super(name); }
-    move(distanceInMeters = 5) {
-        console.log("Slithering...");
-        super.move(distanceInMeters);
-    }
-}
-class boardStateObj {
+	export interface position {
+		row: number;
+		col: number;
+	}
+	
+	export interface wallArray {
+		horiz:any[];
+		vert:any[];
+	}
 
-}
+	export interface boardStateObj {
+		walls: wallArray;
+		tiles: any[];
+	}
 
-	class moveAction {
+	function newBoardState(){
+		return {
+			"walls":{"horiz":[],"vert":[]},
+			"tiles":[]
+		}
+	}
+
+	function getMove(movename){
+		switch(movename.toLowerCase()){
+			case "drive":
+				return new drive();
+			case "shoot":
+				return new shoot();
+			case "build":
+				return new build();
+			case "view":
+				return new view();
+			case "timeout":
+				return new timeout();
+		}
+		throw "move not found:"+movename;
+	}
+
+	export class moveAction {
 		boardState: boardStateObj;
-		playerLocation: {row:-1,col:-1};
+		playerLocation: position;
 		prepareMove(direction: string) {};
-		tilesAffected: [];
+		tilesAffected: any[];
 		moveOrder: number;
 		currentView: boardStateObj;
-		constructor(){};
-		/*
-		* move = 10
-		* shoot = 20
-		* build = 30
-		* view = 100
-		*/
+		constructor(){
+			this.boardState = null;
+			this.playerLocation = {row:-1,col:-1};
+			this.tilesAffected = [];
+			this.moveOrder = -1;
+		}
 
 		tilesUntilWall(direction: string){
 			var tilerow = this.playerLocation.row;
@@ -80,59 +98,47 @@ class boardStateObj {
 			return output;
 		}
 	}
-	this.getMove = function(movename){
-		switch(movename.toLowerCase()){
-			case "drive":
-				return new this.drive();
-			case "shoot":
-				return new this.shoot();
-			case "build":
-				return new this.build();
-			case "view":
-				return new this.view();
-			case "timeout":
-				return new this.timeout();
-		}
-		throw "move not found:"+movename;
-	}
 
-	class drive extends moveAction {
+	export class drive extends moveAction {
 		prepareMove(direction){
-			var movespace = tilesUntilWall(direction);
+			var movespace = this.tilesUntilWall(direction);
 			if(movespace.length > 1) {
-				tilesAffected = movespace[1];
+				this.tilesAffected = movespace[1];
 			} else {
-				tilesAffected = movespace[0];
+				this.tilesAffected = movespace[0];
 			}
 		};
 		constructor(){
-			moveOrder=10;
+			super();
+			this.moveOrder=10;
 		}
 	}
 
-	class timeout extends moveAction{
+	export class timeout extends moveAction{
 		prepareMove(direction){
 			alert("executable timed out (10 seconds)");
 		}
 		constructor(){
-			moveOrder = 0;
+			super();
+			this.moveOrder = 0;
 		}
 	}
 
-	class shoot extends moveAction{
+	export class shoot extends moveAction{
 		prepareMove(direction) {
-			var movespace = tilesUntilWall(direction);
-			tilesAffected = movespace.splice(0,1);
+			var movespace = this.tilesUntilWall(direction);
+			this.tilesAffected = movespace.splice(0,1);
 		}
-		makeMove:(direction:string) {
+		makeMove(direction:string) {
 
 		}
 		constructor(){
-			moveOrder = 20;
+			super();
+			this.moveOrder = 20;
 		}
 	}
 
-	class build extends moveAction{
+	export class build extends moveAction{
 		prepareMove(direction:string) {
 			this.tilesAffected = [];
 			if(direction.match(/^n$/i)) { this.buildWall(this.boardState.walls.horiz, this.playerLocation.row-1, this.playerLocation.col);return;}
@@ -141,25 +147,26 @@ class boardStateObj {
 			if(direction.match(/^w$/i)) { this.buildWall(this.boardState.walls.vert, this.playerLocation.row, this.playerLocation.col);return;}
 		};
 
-		buildWall:(walls:any, row:number, col:number) {
+		buildWall(walls:any, row:number, col:number) {
 			if(walls && walls[row] && walls[row].columns[col]) {
 				walls[row].columns[col].blocked = true;
 			}
 		};
 
 		constructor(){
-			moveOrder = 30;
+			super();
+			this.moveOrder = 30;
 		}
 	}
 
-	class view extends moveAction{
+	export class view extends moveAction{
 		prepareMove(direction) {
-			this.currentView = {};
+			this.currentView = newBoardState();
 		}
 		makeMove(){}
 
 		constructor(){
-			moveOrder = 100;
+			super();
+			this.moveOrder = 100;
 		}
 	}
-}
